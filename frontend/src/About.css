@@ -1,0 +1,37 @@
+.about {
+    display: flex;
+    flex-direction: column;
+    padding-top: 8vh;
+    text-align: center;
+}
+
+.blurb {
+    display: flex;
+    flex-direction: row;
+    color: white;
+    /*padding: 10vh 10vw 2vh;*/
+    float: left;
+}
+
+.chompAboutBlurb {
+    font-size: 4vw;
+    padding-top: 4vh;
+}
+
+.developerBlurb {
+    padding-bottom: 5vh;
+    font-size: 3vmin;
+}
+
+.pics {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: 2vh;
+    font-family: 'Old Standard TT';
+}
+
+#nonSerifAbout {
+    font-family: 'Fredoka One';
+    color:white;
+}

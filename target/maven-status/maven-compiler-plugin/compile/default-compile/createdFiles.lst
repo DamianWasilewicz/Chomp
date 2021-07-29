@@ -1,0 +1,17 @@
+edu/brown/cs/student/main/Main$DashboardHandler.class
+edu/brown/cs/student/main/Main$LogHandler.class
+edu/brown/cs/student/main/Main.class
+edu/brown/cs/student/Encryption/CipherHandler.class
+edu/brown/cs/student/main/Main$SignUpHandler.class
+edu/brown/cs/student/food/FoodComparator.class
+edu/brown/cs/student/Authentication/CreateUser.class
+edu/brown/cs/student/user/User.class
+edu/brown/cs/student/user/DataProcessing.class
+edu/brown/cs/student/main/Main$NutritionHandler.class
+edu/brown/cs/student/main/Main$ExceptionPrinter.class
+edu/brown/cs/student/main/Main$ScheduleHandler.class
+edu/brown/cs/student/main/Main$CustomFormHandler.class
+edu/brown/cs/student/user/Repl.class
+edu/brown/cs/student/main/Main$LoginHandler.class
+edu/brown/cs/student/food/Food.class
+edu/brown/cs/student/Math/Algorithms.class

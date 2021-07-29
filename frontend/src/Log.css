@@ -1,0 +1,37 @@
+.log {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 5vh;
+    font-size: 3vw;
+}
+
+.welcomeLog {
+    padding: 4vh 20vh;
+    background-color: #598E61;
+}
+
+.logRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 130px 15px;
+}
+
+#logRowInput {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.nutrition {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 2vh;
+}
+
+.cal {
+    color:black;
+
+}

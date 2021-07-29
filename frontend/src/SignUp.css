@@ -1,0 +1,34 @@
+.signUpPage {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    display: flex;
+    flex-direction: row;
+}
+
+.signUp {
+    text-align: left;
+    font-size: 3vmin;
+    padding-left: 10vw;
+}
+
+.signUpHeader {
+    font-size: 3vw;
+}
+
+.consent {
+    padding-right: 100px;
+    padding-left: 100px;
+}
+
+.consentHeader {
+    font-size: 3vw;
+}
+
+#nonSerifSignUp {
+    font-family: 'Fredoka One';
+    color: white;
+}
+
+#serif {
+    font-family: 'Old Standard TT';
+}

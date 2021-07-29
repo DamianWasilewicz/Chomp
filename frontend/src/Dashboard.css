@@ -1,0 +1,24 @@
+.dashboard {
+    padding-top: 5vh;
+}
+
+#dashboardList {
+    font-size: 2vw;
+}
+
+#dashboardList:hover {
+    background-color: transparent;
+}
+
+.instructions {
+    padding: 4vh 20vh;
+    background-color: #598E61;
+}
+
+.stats {
+    padding-bottom: 4vh;
+}
+
+.listOfLogs {
+    padding-top: 4vh;
+}

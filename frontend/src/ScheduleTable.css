@@ -1,0 +1,32 @@
+li {
+    font-size: 2vh;
+    color: white;
+}
+
+li:hover {
+    background: #922626;
+}
+
+li:active {
+    background: #598E61;
+}
+
+#nonSerif {
+    font-family: 'Fredoka One';
+    color: #2c4730;
+}
+
+.requestButton {
+    padding-bottom: 1vh;
+    padding-top: 1vh;
+}
+
+.schedule {
+    padding-top: 5vh;
+    padding-bottom: 10vh;
+}
+
+#nonSerifSchedule {
+    font-family: 'Fredoka One';
+    color: white;
+}

@@ -1,0 +1,50 @@
+.login {
+    padding-bottom: 5vh;
+    font-size: 3vmin;
+}
+
+.loginInstruct {
+    padding-top: 40px;
+    padding-left: 10vw;
+}
+
+.loginBlock {
+    display: flex;
+    flex-direction: row;
+    color: white;
+    padding: 10vh 10vw 10vh;
+    float: left;
+}
+
+.splash {
+    display: flex;
+    flex-direction: row;
+    color: white;
+    padding: 10vh 10vw 2vh;
+    float: left;
+}
+
+.chompBlurb {
+    font-size: 4vmin;
+    padding-right: 15vw;
+}
+
+.submit {
+    background-color: #436b49;
+    outline: none;
+    color: white;
+    border-style: solid;
+    border-color: transparent;
+    font-size: 2vw;
+}
+
+.submit:hover {
+    border-style: solid;
+    border-color: transparent;
+    background-color: #2c4730;
+    text-decoration: underline;
+}
+
+#errorMsg {
+    color: #FF6666;
+}
