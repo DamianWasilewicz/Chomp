@@ -11,7 +11,7 @@ import Border from "./Border";
  * Component for the about page. Contains blurbs about the program and the
  * developers, as well as a button to log in and/or sign up.
  */
-function About() {
+function About(props) {
 
     const [bio, setBio] = useState("")
 
@@ -48,13 +48,25 @@ function About() {
         }
     }
 
+    const renderSignInBlurb = () => {
+        return (
+            !props.loggedIn ?
+                <div> <button onClick={triggerLogin}> Log In/Sign Up Here! </button> </div> :
+                <div></div>
+        )
+    }
+
     return(
         <div className="about">
-            <div> <button onClick={triggerLogin}> Log In/Sign Up Here! </button> </div>
+            {renderSignInBlurb()}
             <div className="chompAboutBlurb">
                 <h1> <strong>CHOMP!</strong> </h1>
                 <h3> <em>plan better, eat healthier</em> </h3>
-                <h4 id="serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h4>
+                <h4 id="serif">Chomp! is dedicated to helping people get on track and stay on track when it comes to
+                    eating healthy. We display useful, personalized statistics for our users while also advertising
+                    fresh alternatives for daily meal consumption. By providing users with meal options set to their
+                    specifications, Chomp! can meet the needs of just about anyone. Sign up today to get started on
+                    your journey with Chomp!</h4>
             </div>
 
             <Border />
@@ -62,6 +74,7 @@ function About() {
             <div className="developerBlurb">
                 <h1> <strong>About us!</strong> </h1>
                 <h3> <em>Four students, hanging on for dear life in a pandemic ridden semester.</em> </h3>
+                <h4> click on our heads to learn more ;) </h4>
                 <div className="pics">
                     <figure>
                         <img src={eva} alt="Eva" width="200" height="210" onClick={() => toggleBio("eva")}/>
@@ -79,11 +92,6 @@ function About() {
                         <img src={jordan} alt="Jordan" width="200" height="210" onClick={() => toggleBio("jordan")} />
                         <figcaption id="nonSerifAbout">Jordan Walendom</figcaption>
                     </figure>
-
-
-
-
-
                 </div>
                 <div className="pics">
                     {bio}

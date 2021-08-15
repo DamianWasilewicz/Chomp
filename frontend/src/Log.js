@@ -87,10 +87,10 @@ function Log() {
         if (nutritionInfo.length !== 0){
             return(
                 <ul>
-                    <li>Proteins: {nutritionInfo[0]}g</li>
-                    <li>Fats: {nutritionInfo[1]}g</li>
-                    <li>Carbohydrates: {nutritionInfo[2]}g</li>
-                    <li>Calories: {nutritionInfo[3]}kCal</li>
+                    <h3>Proteins: {nutritionInfo[0]}g</h3>
+                    <h3>Fats: {nutritionInfo[1]}g</h3>
+                    <h3>Carbohydrates: {nutritionInfo[2]}g</h3>
+                    <h3>Calories: {nutritionInfo[3]}kCal</h3>
                 </ul>
             )
         }
@@ -129,7 +129,7 @@ function Log() {
             <div> <h3>{message}</h3> </div>
 
             {/*conditional render*/}
-            <div> <CustomFoodForm display={custom}/> </div>
+            <div> <CustomFoodForm setFood={setFood} setDate={setDate} name={foodName} date={dateStamp} display={custom}/> </div>
 
             <Border />
 
@@ -142,9 +142,9 @@ function Log() {
             </div>
 
             <div> <button onClick={getFax}> Get Nutrition Info </button> </div>
-
+            <br />
             <div>
-                <h3>{nutritionMsg}</h3>
+                <h3><em>{nutritionMsg}</em></h3>
                 <div>{labelledListNutrition()}</div>
             </div>
         </div>

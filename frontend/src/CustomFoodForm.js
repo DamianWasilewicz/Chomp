@@ -1,15 +1,13 @@
 import Textbox from "./Textbox";
 import React, {useState} from "react";
 import axios from "axios";
+import './Log.css';
 
 /**
  * Component for the Custom Food Form that appears in the Log component
  * if the user enters a food that isn't in our databases.
  */
 function CustomFoodForm(props) {
-    // const [userId, setUserId] = useState("");
-    const [dateStamp, setDate] = useState("");
-    const [food, setFood] = useState("");
     const [cals, setCals] = useState("");
     const [protein, setProtein] = useState("");
     const [fat, setFat] = useState("");
@@ -20,14 +18,15 @@ function CustomFoodForm(props) {
     const sendForm = () => {
         const toSend = {
             // id: userId,
-            date: dateStamp,
-            food: food,
+            date: props.date,
+            food: props.name,
             cals: cals,
             protein: protein,
             fat: fat,
             carbs: carbs
         }
 
+        console.log(toSend)
         let config = {
             headers: {
                 "Content-Type": "application/json",
@@ -56,36 +55,38 @@ function CustomFoodForm(props) {
             <div>
                 <div className="customForm">
                     <Textbox
-                        type={"date of log"}
-                        label={"Date:"}
-                        change={setDate}
-                    />
-                    <Textbox
                         type={"foodName"}
                         label={"Food Name:"}
-                        change={setFood}
+                        change={props.setFood}
+                        value={props.name}
+                    />
+                    <Textbox
+                        type={"date of log"}
+                        label={"Date:"}
+                        change={props.setDate}
+                        value={props.date}
                     />
                     <Textbox
                         type={"calories"}
-                        label={"Calories:"}
+                        label={"Calories (kCal):"}
                         change={setCals}
                     />
                     <Textbox
                         type={"protein"}
-                        label={"Protein:"}
+                        label={"Protein (g):"}
                         change={setProtein}
                     />
                     <Textbox
                         type={"fat"}
-                        label={"Fat:"}
+                        label={"Fat (g):"}
                         change={setFat}
                     />
                     <Textbox
                         type={"carbs"}
-                        label={"Carbohydrates:"}
+                        label={"Carbohydrates (g):"}
                         change={setCarbs}
                     />
-                    <button onClick={sendForm}> Log food! </button>
+                    <button className="submitLog" onClick={sendForm}> Log food! </button>
                 </div>
                 <div>
                     {message}

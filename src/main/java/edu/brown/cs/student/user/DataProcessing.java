@@ -77,8 +77,6 @@ public class DataProcessing {
         foodNames.add(rs.getString(1));
         foodID.add(rs.getInt(2));
       }
-      System.out.println("Length of foodNames list: " + foodNames.size());
-      System.out.println("Length of foodId list: " + foodID.size());
       prep.close();
       rs.close();
     } catch (SQLException throwables) {
@@ -140,7 +138,6 @@ public class DataProcessing {
       rs.close();
       prep.close();
     }
-    System.out.println("Length of priorities list: " + priorities.size());
     return priorities;
   }
 
@@ -222,7 +219,6 @@ public class DataProcessing {
       prep1.setInt(2, proteinId);
       ResultSet rs1 = prep1.executeQuery();
       if (rs1.next()) {
-        System.out.println("mapped protein");
         nutrition.put("Protein", rs1.getDouble(1));
       }
       rs1.close();
@@ -238,7 +234,6 @@ public class DataProcessing {
       prep2.setInt(2, fatId);
       ResultSet rs2 = prep2.executeQuery();
       if (rs2.next()) {
-        System.out.println("mapped fat");
         nutrition.put("Fat", rs2.getDouble(1));
       }
       rs2.close();
@@ -254,7 +249,6 @@ public class DataProcessing {
       prep3.setInt(2, carbId);
       ResultSet rs3 = prep3.executeQuery();
       if (rs3.next()) {
-        System.out.println("mapped carbs");
         nutrition.put("Carbohydrates", rs3.getDouble(1));
       }
       rs3.close();
@@ -321,9 +315,6 @@ public class DataProcessing {
    * @throws SQLException If there is an error executing the SQL query.
    */
   public void updatePriorityTables() throws ClassNotFoundException, SQLException {
-//      Class.forName("org.sqlite.JDBC");
-//      String urlToDB = "jdbc:sqlite:" + userDbFilename;
-//      conn = DriverManager.getConnection(urlToDB);
     int foodCounter = 0;
     for (int i = 1; i < numTables; i++) {
       String table = "priorities" + String.valueOf(i);
@@ -331,9 +322,6 @@ public class DataProcessing {
       for (int j = 0; j < numColumns - 1; j++) {
         PreparedStatement prep = conn2.prepareStatement(
                 "ALTER TABLE " + table + "  ADD '" + foodCounter + "'REAL");
-//          prep.setString(1, foodNames.get(foodCounter));
-//          prep.setString(2, foodNames.get(foodCounter));
-        System.out.println(foodID.get(foodCounter));
         prep.executeUpdate();
         foodCounter++;
         prep.close();
@@ -351,13 +339,9 @@ public class DataProcessing {
     int foodCounter = 0;
     for (int i = 1; i < numTables; i++) {
       String table = "date" + String.valueOf(i);
-      System.out.println(table);
       for (int j = 0; j < numColumns - 1; j++) {
         PreparedStatement prep = conn2.prepareStatement(
                 "ALTER TABLE " + table + "  ADD '" + foodCounter + "'REAL");
-//          prep.setString(1, foodNames.get(foodCounter));
-//          prep.setString(2, foodNames.get(foodCounter));
-        System.out.println(foodID.get(foodCounter));
         prep.executeUpdate();
         foodCounter++;
         prep.close();
@@ -725,8 +709,6 @@ public class DataProcessing {
    */
   public int insertCustomLog(List<String> log) {
 
-    // Math.random() * (max - min) + min;
-    // TODO: jordan, make this actually unique by keeping counter for user
     String foodId = Integer.toString((int) (Math.random() * (randomBounds1) + randomBounds2));
     String foodName = log.get(0);
     String calories = log.get(1);
@@ -736,9 +718,11 @@ public class DataProcessing {
     String userId = log.get(5);
     String date = log.get(6);
 
-
     // validating cals is a double
     try {
+      if (calories.equals("")) {
+        return 1;
+      }
       Double.parseDouble(calories);
     } catch (Exception e) {
       System.out.println("ERROR: calories are not a double");
@@ -747,6 +731,9 @@ public class DataProcessing {
 
     // validating protein is a double
     try {
+      if (protein.equals("")) {
+        return 2;
+      }
       Double.parseDouble(protein);
     } catch (Exception e) {
       System.out.println("ERROR: proteins are not a double");
@@ -755,6 +742,9 @@ public class DataProcessing {
 
     // validating fat is a double
     try {
+      if (fats.equals("")) {
+        return 3;
+      }
       Double.parseDouble(fats);
     } catch (Exception e) {
       System.out.println("ERROR: fats are not a double");
@@ -763,6 +753,9 @@ public class DataProcessing {
 
     // validating carbs is a double
     try {
+      if (carbs.equals("")) {
+        return 4;
+      }
       Double.parseDouble(carbs);
     } catch (Exception e) {
       System.out.println("ERROR: carbs are not a double");

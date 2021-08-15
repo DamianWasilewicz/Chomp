@@ -1,6 +1,9 @@
 package edu.brown.cs.student.user;
 
 
+import edu.brown.cs.student.Math.Algorithms;
+import edu.brown.cs.student.food.Food;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -50,9 +53,20 @@ public class Repl {
         while (m.find()) {
           command.add(m.group(1));
         }
+        if (command.get(0).equals("elo")) {
+          System.out.println(eloUpdate(command.get(1), command.get(2), command.get(3)));
+        }
       } else {
         break;
       }
     }
+  }
+
+  public double eloUpdate(String foodA, String foodB, String foodC) {
+    Food food1 = new Food(foodA, 1, 0, 5.0, 0);
+    Food food2 = new Food(foodB, 2, 1, 6.0, 0);
+    Food food3 = new Food(foodC, 3, 2, 4.0, 0);
+    Algorithms algorithm = new Algorithms();
+    return algorithm.eloUpdateWinner(food1, food2, food3);
   }
 }

@@ -1,0 +1,1108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataProcessing.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chomp</a> &gt; <a href="index.source.html" class="el_package">edu.brown.cs.student.user</a> &gt; <span class="el_source">DataProcessing.java</span></div><h1>DataProcessing.java</h1><pre class="source lang-java linenums">package edu.brown.cs.student.user;
+
+import edu.brown.cs.student.food.Food;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.lang.Integer.parseInt;
+
+/**
+ * Class dedicated to database querying and manipulation.
+ */
+public class DataProcessing {
+
+<span class="fc" id="L20">  private List&lt;String&gt; foodNames = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L21">  private List&lt;Integer&gt; foodID = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L22">  private final int numFoods = 8789;</span>
+<span class="fc" id="L23">  private final String userDbFilename = &quot;data/Users.db&quot;;</span>
+<span class="fc" id="L24">  private final String foodDbFilename = &quot;data/usda.sql3&quot;;</span>
+<span class="fc" id="L25">  private final int proteinId = 203;</span>
+<span class="fc" id="L26">  private final int fatId = 204;</span>
+<span class="fc" id="L27">  private final int carbId = 205;</span>
+<span class="fc" id="L28">  private final int calId = 208;</span>
+<span class="fc" id="L29">  private final int numTables = 10;</span>
+<span class="fc" id="L30">  private final int numColumns = 1025;</span>
+<span class="fc" id="L31">  private final int numColumns2 = 598;</span>
+<span class="fc" id="L32">  private final int numColumns3 = 1024;</span>
+<span class="fc" id="L33">  private final int randomBounds1 = 2000;</span>
+<span class="fc" id="L34">  private final int randomBounds2 = 9000;</span>
+<span class="fc" id="L35">  private static Connection conn1 = null;</span>
+<span class="fc" id="L36">  private static Connection conn2 = null;</span>
+
+
+  /**
+   * Constructor for DataProcessing which sets the current database that will
+   * be used.
+   */
+<span class="fc" id="L43">  public DataProcessing() {</span>
+    try {
+<span class="fc" id="L45">      Class.forName(&quot;org.sqlite.JDBC&quot;);</span>
+<span class="nc" id="L46">    } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L47">      System.out.println(&quot;ERROR: Could not communicate with the databsase&quot;);</span>
+<span class="fc" id="L48">    }</span>
+<span class="fc" id="L49">    String urlToDB = &quot;jdbc:sqlite:&quot; + foodDbFilename;</span>
+    try {
+<span class="fc" id="L51">      conn1 = DriverManager.getConnection(urlToDB);</span>
+<span class="nc" id="L52">    } catch (SQLException throwables) {</span>
+<span class="nc" id="L53">      System.out.println(&quot;ERROR: Could not communicate with the databsase&quot;);</span>
+<span class="fc" id="L54">    }</span>
+    try {
+<span class="fc" id="L56">      Class.forName(&quot;org.sqlite.JDBC&quot;);</span>
+<span class="nc" id="L57">    } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L58">      System.out.println(&quot;ERROR: Could not communicate with the databsase&quot;);</span>
+<span class="fc" id="L59">    }</span>
+<span class="fc" id="L60">    urlToDB = &quot;jdbc:sqlite:&quot; + userDbFilename;</span>
+    try {
+<span class="fc" id="L62">      conn2 = DriverManager.getConnection(urlToDB);</span>
+<span class="nc" id="L63">    } catch (SQLException throwables) {</span>
+<span class="nc" id="L64">      System.out.println(&quot;ERROR: Could not communicate with the databsase&quot;);</span>
+<span class="fc" id="L65">    }</span>
+<span class="fc" id="L66">  }</span>
+
+  /**
+   * Retrieves all the food names and food id's from the USDA database.
+   */
+  public void loadData() {
+<span class="fc" id="L72">    PreparedStatement prep = null;</span>
+    try {
+<span class="fc" id="L74">      prep = conn1.prepareStatement(&quot;SELECT DISTINCT long_desc, id FROM 'food'&quot;);</span>
+<span class="fc" id="L75">      ResultSet rs = prep.executeQuery();</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L77">        foodNames.add(rs.getString(1));</span>
+<span class="fc" id="L78">        foodID.add(rs.getInt(2));</span>
+      }
+<span class="fc" id="L80">      prep.close();</span>
+<span class="fc" id="L81">      rs.close();</span>
+<span class="nc" id="L82">    } catch (SQLException throwables) {</span>
+<span class="nc" id="L83">      System.out.println(&quot;ERROR: Communicating with the database&quot;);</span>
+<span class="fc" id="L84">    }</span>
+<span class="fc" id="L85">  }</span>
+
+  /**
+   * Returns the names of all the foods in our database
+   * NOTE: Order here matters as it is the same order used for priorities and foodGroupIds.
+   *
+   * @return an ordered list of the foods names
+   */
+  public List&lt;String&gt; getFoodNames() {
+<span class="fc" id="L94">    return foodNames;</span>
+  }
+
+  /**
+   * Returns the ids of all the foods in our database
+   * NOTE: Order, as described in the getFoodNames method, matters.
+   *
+   * @return an ordered list of the food ids
+   */
+  public List&lt;Integer&gt; getFoodID() {
+<span class="fc" id="L104">    return foodID;</span>
+  }
+
+  /**
+   * Method that retrieves the priorities of the foods for a specific user as a specified
+   * by the id parameter.
+   *
+   * @param id the id of the user from which we will retrieve the priorities
+   * @return an ArrayList of the priorities of the food where the index of the
+   * array indicates the specific food
+   * @throws ClassNotFoundException If the class is not found.
+   * @throws SQLException If there is an error executing the SQL query.
+   */
+  public List&lt;Double&gt; retrievePriorities(int id) throws ClassNotFoundException, SQLException {
+<span class="fc" id="L118">    List&lt;Double&gt; priorities = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">    for (int i = 1; i &lt; numTables; i++) {</span>
+<span class="fc" id="L120">      String table = &quot;priorities&quot; + String.valueOf(i);</span>
+<span class="fc" id="L121">      PreparedStatement prep = conn2.prepareStatement(</span>
+              &quot;SELECT * FROM '&quot; + table + &quot;' WHERE id = ?&quot;);
+<span class="fc" id="L123">      prep.setInt(1, id);</span>
+<span class="fc" id="L124">      ResultSet rs = prep.executeQuery();</span>
+
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (i != numTables - 1) {</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">          for (int j = 2; j &lt;= numColumns; j++) {</span>
+<span class="fc" id="L129">            priorities.add(rs.getDouble(j));</span>
+          }
+        } else {
+<span class="fc bfc" id="L132" title="All 2 branches covered.">          for (int j = 2; j &lt;= numColumns2; j++) {</span>
+<span class="fc" id="L133">            priorities.add(rs.getDouble(j));</span>
+          }
+        }
+      }
+
+<span class="fc" id="L138">      rs.close();</span>
+<span class="fc" id="L139">      prep.close();</span>
+    }
+<span class="fc" id="L141">    return priorities;</span>
+  }
+
+  /**
+   * Method that retrieves the dates of the foods for a specific user as a specified
+   * by the id parameter.
+   *
+   * @param id the id of the user from which we will retrieve the priorities
+   * @return an ArrayList of the priorities of the food where the index of the
+   * array indicates the specific food
+   * @throws ClassNotFoundException If the class is not found.
+   * @throws SQLException If there is an error executing the SQL query.
+   */
+  public List&lt;Double&gt; retrieveTimeLastSeen(int id) throws ClassNotFoundException, SQLException {
+<span class="fc" id="L155">    List&lt;Double&gt; timeLastSeen = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    for (int i = 1; i &lt; numTables; i++) {</span>
+<span class="fc" id="L157">      String table = &quot;date&quot; + String.valueOf(i);</span>
+<span class="fc" id="L158">      PreparedStatement prep = conn2.prepareStatement(</span>
+              &quot;SELECT * FROM '&quot; + table + &quot;' WHERE id = ?&quot;);
+<span class="fc" id="L160">      prep.setInt(1, id);</span>
+<span class="fc" id="L161">      ResultSet rs = prep.executeQuery();</span>
+
+<span class="fc bfc" id="L163" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        if (i != numTables - 1) {</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">          for (int j = 2; j &lt;= numColumns; j++) {</span>
+<span class="fc" id="L166">            timeLastSeen.add(rs.getDouble(j));</span>
+          }
+        } else {
+<span class="fc bfc" id="L169" title="All 2 branches covered.">          for (int j = 2; j &lt;= numColumns2; j++) {</span>
+<span class="fc" id="L170">            timeLastSeen.add(rs.getDouble(j));</span>
+          }
+        }
+      }
+
+<span class="fc" id="L175">      rs.close();</span>
+<span class="fc" id="L176">      prep.close();</span>
+    }
+<span class="fc" id="L178">    System.out.println(&quot;Length of time last seen list: &quot; + timeLastSeen.size());</span>
+<span class="fc" id="L179">    return timeLastSeen;</span>
+  }
+
+
+  /**
+   * Gets the nutrition information for foods.
+   *
+   * @param foodId the id of the food whose information we are retrieving
+   * @param userId userID
+   * @return a hashmap mapping from the nutrional component to its value for the specified food
+   */
+  public Map&lt;String, Double&gt; getNutrition(int foodId, String userId) {
+<span class="fc" id="L191">    Map&lt;String, Double&gt; nutrition = new HashMap&lt;&gt;();</span>
+
+    try {
+<span class="fc" id="L194">      PreparedStatement prep = conn2.prepareStatement(</span>
+              &quot;SELECT * FROM 'CustomFoods' WHERE foodId = ? AND userId = ?&quot;);
+<span class="fc" id="L196">      prep.setInt(1, foodId);</span>
+<span class="fc" id="L197">      prep.setString(2, userId);</span>
+
+<span class="fc" id="L199">      ResultSet rs = prep.executeQuery();</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">      if (rs.next()) {</span>
+<span class="nc" id="L201">        nutrition.put(&quot;Protein&quot;, rs.getDouble(&quot;protein&quot;));</span>
+<span class="nc" id="L202">        nutrition.put(&quot;Fat&quot;, rs.getDouble(&quot;fats&quot;));</span>
+<span class="nc" id="L203">        nutrition.put(&quot;Carbohydrates&quot;, rs.getDouble(&quot;carbs&quot;));</span>
+<span class="nc" id="L204">        nutrition.put(&quot;Calories&quot;, rs.getDouble(&quot;calories&quot;));</span>
+<span class="nc" id="L205">        return nutrition;</span>
+      }
+
+<span class="fc" id="L208">      rs.close();</span>
+<span class="fc" id="L209">      prep.close();</span>
+
+<span class="nc" id="L211">    } catch (Exception e) {</span>
+<span class="nc" id="L212">      e.printStackTrace();</span>
+<span class="fc" id="L213">    }</span>
+
+    try {
+<span class="fc" id="L216">      PreparedStatement prep1 = conn1.prepareStatement(</span>
+              &quot;SELECT amount FROM 'nutrition' WHERE food_id = ? AND nutrient_id = ?&quot;);
+<span class="fc" id="L218">      prep1.setInt(1, foodId);</span>
+<span class="fc" id="L219">      prep1.setInt(2, proteinId);</span>
+<span class="fc" id="L220">      ResultSet rs1 = prep1.executeQuery();</span>
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">      if (rs1.next()) {</span>
+<span class="fc" id="L222">        nutrition.put(&quot;Protein&quot;, rs1.getDouble(1));</span>
+      }
+<span class="fc" id="L224">      rs1.close();</span>
+<span class="fc" id="L225">      prep1.close();</span>
+<span class="nc" id="L226">    } catch (Exception e) {</span>
+<span class="nc" id="L227">      e.printStackTrace();</span>
+<span class="fc" id="L228">    }</span>
+
+    try {
+<span class="fc" id="L231">      PreparedStatement prep2 = conn1.prepareStatement(</span>
+              &quot;SELECT amount FROM 'nutrition' WHERE food_id = ? AND nutrient_id = ?&quot;);
+<span class="fc" id="L233">      prep2.setInt(1, foodId);</span>
+<span class="fc" id="L234">      prep2.setInt(2, fatId);</span>
+<span class="fc" id="L235">      ResultSet rs2 = prep2.executeQuery();</span>
+<span class="pc bpc" id="L236" title="1 of 2 branches missed.">      if (rs2.next()) {</span>
+<span class="fc" id="L237">        nutrition.put(&quot;Fat&quot;, rs2.getDouble(1));</span>
+      }
+<span class="fc" id="L239">      rs2.close();</span>
+<span class="fc" id="L240">      prep2.close();</span>
+<span class="nc" id="L241">    } catch (Exception e) {</span>
+<span class="nc" id="L242">      e.printStackTrace();</span>
+<span class="fc" id="L243">    }</span>
+
+    try {
+<span class="fc" id="L246">      PreparedStatement prep3 = conn1.prepareStatement(</span>
+              &quot;SELECT amount FROM 'nutrition' WHERE food_id = ? AND nutrient_id = ?&quot;);
+<span class="fc" id="L248">      prep3.setInt(1, foodId);</span>
+<span class="fc" id="L249">      prep3.setInt(2, carbId);</span>
+<span class="fc" id="L250">      ResultSet rs3 = prep3.executeQuery();</span>
+<span class="pc bpc" id="L251" title="1 of 2 branches missed.">      if (rs3.next()) {</span>
+<span class="fc" id="L252">        nutrition.put(&quot;Carbohydrates&quot;, rs3.getDouble(1));</span>
+      }
+<span class="fc" id="L254">      rs3.close();</span>
+<span class="fc" id="L255">      prep3.close();</span>
+<span class="nc" id="L256">    } catch (Exception e) {</span>
+<span class="nc" id="L257">      e.printStackTrace();</span>
+<span class="fc" id="L258">    }</span>
+
+    try {
+<span class="fc" id="L261">      PreparedStatement prep4 = conn1.prepareStatement(</span>
+              &quot;SELECT amount FROM 'nutrition' WHERE food_id = ? AND nutrient_id = ?&quot;);
+<span class="fc" id="L263">      prep4.setInt(1, foodId);</span>
+<span class="fc" id="L264">      prep4.setInt(2, calId);</span>
+<span class="fc" id="L265">      ResultSet rs4 = prep4.executeQuery();</span>
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">      if (rs4.next()) {</span>
+<span class="fc" id="L267">        System.out.println(&quot;mapped cals&quot;);</span>
+<span class="fc" id="L268">        nutrition.put(&quot;Calories&quot;, rs4.getDouble(1));</span>
+      }
+<span class="fc" id="L270">      rs4.close();</span>
+<span class="fc" id="L271">      prep4.close();</span>
+<span class="nc" id="L272">    } catch (Exception e) {</span>
+<span class="nc" id="L273">      e.printStackTrace();</span>
+<span class="fc" id="L274">    }</span>
+
+<span class="fc" id="L276">    return nutrition;</span>
+  }
+
+  /**
+   * Method to create the priority table.
+   * @throws SQLException If there is an error executing the SQL query.
+   * @throws ClassNotFoundException If the class is not found.
+   */
+  public void resetPriorityTables() throws SQLException, ClassNotFoundException {
+<span class="nc" id="L285">    int foodCounter = 0;</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">    for (int i = 1; i &lt; numTables; i++) {</span>
+<span class="nc" id="L287">      String table = &quot;priorities&quot; + String.valueOf(i);</span>
+<span class="nc" id="L288">      PreparedStatement prep = conn2.prepareStatement(</span>
+              &quot;CREATE TABLE IF NOT EXISTS &quot; + table + &quot; (id INTEGER, PRIMARY KEY (id))&quot;);
+<span class="nc" id="L290">      prep.executeUpdate();</span>
+<span class="nc" id="L291">      prep.close();</span>
+    }
+<span class="nc" id="L293">  }</span>
+
+  /**
+   * Method to create data tables.
+   * @throws SQLException If there is an error executing the SQL query.
+   * @throws ClassNotFoundException If the class is not found.
+   */
+  public void resetDateTables() throws SQLException, ClassNotFoundException {
+<span class="nc" id="L301">    int foodCounter = 0;</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">    for (int i = 1; i &lt; numTables; i++) {</span>
+<span class="nc" id="L303">      String table = &quot;date&quot; + String.valueOf(i);</span>
+<span class="nc" id="L304">      PreparedStatement prep = conn2.prepareStatement(</span>
+              &quot;CREATE TABLE IF NOT EXISTS &quot; + table + &quot; (id INTEGER, PRIMARY KEY (id))&quot;);
+<span class="nc" id="L306">      prep.executeUpdate();</span>
+<span class="nc" id="L307">      prep.close();</span>
+    }
+<span class="nc" id="L309">  }</span>
+
+
+  /**
+   * ALters priority tables to add columns for food IDS.
+   * @throws ClassNotFoundException If the class is not found.
+   * @throws SQLException If there is an error executing the SQL query.
+   */
+  public void updatePriorityTables() throws ClassNotFoundException, SQLException {
+<span class="nc" id="L318">    int foodCounter = 0;</span>
+<span class="nc bnc" id="L319" title="All 2 branches missed.">    for (int i = 1; i &lt; numTables; i++) {</span>
+<span class="nc" id="L320">      String table = &quot;priorities&quot; + String.valueOf(i);</span>
+<span class="nc" id="L321">      System.out.println(table);</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">      for (int j = 0; j &lt; numColumns - 1; j++) {</span>
+<span class="nc" id="L323">        PreparedStatement prep = conn2.prepareStatement(</span>
+                &quot;ALTER TABLE &quot; + table + &quot;  ADD '&quot; + foodCounter + &quot;'REAL&quot;);
+<span class="nc" id="L325">        prep.executeUpdate();</span>
+<span class="nc" id="L326">        foodCounter++;</span>
+<span class="nc" id="L327">        prep.close();</span>
+      }
+    }
+<span class="nc" id="L330">  }</span>
+
+  /**
+   * ALters time last seen tables to add columns for food IDS.
+   * @throws ClassNotFoundException If the class is not found.
+   * @throws SQLException If there is an error executing the SQL query.
+   *
+   */
+  public void updateTimeSinceSeenTables() throws ClassNotFoundException, SQLException {
+<span class="nc" id="L339">    int foodCounter = 0;</span>
+<span class="nc bnc" id="L340" title="All 2 branches missed.">    for (int i = 1; i &lt; numTables; i++) {</span>
+<span class="nc" id="L341">      String table = &quot;date&quot; + String.valueOf(i);</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">      for (int j = 0; j &lt; numColumns - 1; j++) {</span>
+<span class="nc" id="L343">        PreparedStatement prep = conn2.prepareStatement(</span>
+                &quot;ALTER TABLE &quot; + table + &quot;  ADD '&quot; + foodCounter + &quot;'REAL&quot;);
+<span class="nc" id="L345">        prep.executeUpdate();</span>
+<span class="nc" id="L346">        foodCounter++;</span>
+<span class="nc" id="L347">        prep.close();</span>
+      }
+    }
+<span class="nc" id="L350">  }</span>
+
+  /**
+   * Iterates through each of the priority tables and updates database priority value
+   * based on value in foodlist.
+   *
+   * @param userID The integer id of the user we want to update priorities for.
+   * @param foods The list of all foods in the database.
+   */
+  public void updatePriorities(int userID, List&lt;Food&gt; foods) {
+<span class="nc" id="L360">    updatePriorityTable(userID, foods, 1, 0, numColumns3 - 1);</span>
+<span class="nc" id="L361">    updatePriorityTable(userID, foods, 2, numColumns3, (2 * numColumns3) - 1);</span>
+<span class="nc" id="L362">    updatePriorityTable(userID, foods, 3, 2 * numColumns3, (3 * numColumns3) - 1);</span>
+<span class="nc" id="L363">    updatePriorityTable(userID, foods, 4, 3 * numColumns3, (4 * numColumns3) - 1);</span>
+<span class="nc" id="L364">    updatePriorityTable(userID, foods, 5, 4 * numColumns3, (5 * numColumns3) - 1);</span>
+<span class="nc" id="L365">    updatePriorityTable(userID, foods, 6, 5 * numColumns3, (6 * numColumns3) - 1);</span>
+<span class="nc" id="L366">    updatePriorityTable(userID, foods,</span>
+            (numTables - 3), 6 * numColumns3, ((numTables - 3) * numColumns3) - 1);
+<span class="nc" id="L368">    updatePriorityTable(userID, foods, (numTables - 2),</span>
+            (numTables - 3) * numColumns3, ((numTables - 2) * numColumns3) - 1);
+<span class="nc" id="L370">    updatePriorityTable(userID, foods, (numTables - 1),</span>
+            (numTables - 2) * numColumns3, ((numTables - 1) * numColumns3) - 1);
+<span class="nc" id="L372">  }</span>
+
+  /**
+   * Iterates through each of the dates tables and updates database priority value
+   * based on value in foodlist.
+   *
+   * @param userID The integer id of the user we want to update dates for.
+   * @param foods The list of all foods from the database.
+   * @throws ClassNotFoundException If the class is not found.
+   * @throws SQLException If there is an error executing the SQL query.
+   */
+  public void updateDates(int userID, List&lt;Food&gt; foods)
+          throws ClassNotFoundException, SQLException {
+<span class="nc" id="L385">    updateDateTable(userID, foods, 1, 0, numColumns3 - 1);</span>
+<span class="nc" id="L386">    updateDateTable(userID, foods, 2, numColumns3, (2 * numColumns3) - 1);</span>
+<span class="nc" id="L387">    updateDateTable(userID, foods, 3, 2 * numColumns3, (3 * numColumns3) - 1);</span>
+<span class="nc" id="L388">    updateDateTable(userID, foods, 4, 3 * numColumns3, (4 * numColumns3) - 1);</span>
+<span class="nc" id="L389">    updateDateTable(userID, foods, 5, 4 * numColumns3, (5 * numColumns3) - 1);</span>
+<span class="nc" id="L390">    updateDateTable(userID, foods, 6, 5 * numColumns3, (6 * numColumns3) - 1);</span>
+<span class="nc" id="L391">    updateDateTable(userID, foods, (numTables - 3),</span>
+            6 * numColumns3, ((numTables - 3) * numColumns3) - 1);
+<span class="nc" id="L393">    updateDateTable(userID, foods, (numTables - 2),</span>
+            (numTables - 3) * numColumns3, ((numTables - 2) * numColumns3) - 1);
+<span class="nc" id="L395">    updateDateTable(userID, foods, (numTables - 1),</span>
+            (numTables - 2) * numColumns3, ((numTables - 1) * numColumns3) - 1);
+<span class="nc" id="L397">  }</span>
+
+
+  /**
+   * Helper method to update the database priorities of a particular priority table for
+   * foods based on logical priority value.
+   * @param userID The integer id of the user we want to update priorities for.
+   * @param foods The list of all foods from the database.
+   * @param table The priority table we want to update.
+   * @param start The starting index of the table.
+   * @param end The ending index of the table.
+   */
+
+  private void updatePriorityTable(int userID, List&lt;Food&gt; foods, int table, int start, int end) {
+<span class="nc" id="L411">    String statement = &quot;UPDATE priorities&quot; + table + &quot; SET&quot;;</span>
+<span class="nc bnc" id="L412" title="All 2 branches missed.">    for (int i = start; i &lt; end; i++) {</span>
+<span class="nc" id="L413">      statement += &quot; '&quot; + i + &quot;' = ?,&quot;;</span>
+    }
+<span class="nc" id="L415">    statement += &quot; '&quot; + end + &quot;' = ?&quot;;</span>
+<span class="nc" id="L416">    statement += &quot;WHERE id = ?&quot;;</span>
+    try {
+<span class="nc" id="L418">      System.out.println(statement);</span>
+<span class="nc" id="L419">      PreparedStatement prep = conn2.prepareStatement(statement);</span>
+<span class="nc" id="L420">      int index = 1;</span>
+<span class="nc bnc" id="L421" title="All 2 branches missed.">      for (int j = start; j &lt; end; j++) {</span>
+<span class="nc" id="L422">        Food current = foods.get(j);</span>
+<span class="nc" id="L423">        double currentPriority = current.getPriority();</span>
+<span class="nc" id="L424">        prep.setDouble(index, currentPriority);</span>
+<span class="nc" id="L425">        index++;</span>
+      }
+<span class="nc" id="L427">      prep.setInt(index, userID);</span>
+<span class="nc" id="L428">      prep.executeUpdate();</span>
+<span class="nc" id="L429">      prep.close();</span>
+<span class="nc" id="L430">    } catch (Exception e) {</span>
+<span class="nc" id="L431">      System.out.println(&quot;Exception occured while updating priority table&quot;);</span>
+<span class="nc" id="L432">      e.printStackTrace();</span>
+<span class="nc" id="L433">      return;</span>
+<span class="nc" id="L434">    }</span>
+<span class="nc" id="L435">  }</span>
+
+  /**
+   * Helper method to update the database priorities of a particular priority table for
+   * foods based on logical priority value.
+   * @param userID The integer id of the user we want to update dates for.
+   * @param foods The list of all foods from the database.
+   * @param table The date table we want to update.
+   * @param start The starting index in the table.
+   * @param end The ending index in the table.
+   */
+  private void updateDateTable(int userID, List&lt;Food&gt; foods, int table, int start, int end) {
+<span class="nc" id="L447">    String statement = &quot;UPDATE date&quot; + table + &quot; SET&quot;;</span>
+<span class="nc bnc" id="L448" title="All 2 branches missed.">    for (int i = start; i &lt; end; i++) {</span>
+<span class="nc" id="L449">      statement += &quot; '&quot; + i + &quot;' = ?,&quot;;</span>
+    }
+<span class="nc" id="L451">    statement += &quot; '&quot; + end + &quot;' = ?&quot;;</span>
+<span class="nc" id="L452">    statement += &quot;WHERE id = ?&quot;;</span>
+    try {
+<span class="nc" id="L454">      System.out.println(statement);</span>
+<span class="nc" id="L455">      PreparedStatement prep = conn2.prepareStatement(statement);</span>
+<span class="nc" id="L456">      int index = 1;</span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">      for (int j = start; j &lt; end; j++) {</span>
+<span class="nc" id="L458">        Food current = foods.get(j);</span>
+        //Change this line to get current date instead of current priority
+<span class="nc" id="L460">        double currentTimeSinceLastSeen = current.getTimeSinceLastSeen();</span>
+<span class="nc" id="L461">        prep.setDouble(index, currentTimeSinceLastSeen);</span>
+<span class="nc" id="L462">        index++;</span>
+      }
+<span class="nc" id="L464">      prep.setInt(index, userID);</span>
+<span class="nc" id="L465">      prep.executeUpdate();</span>
+<span class="nc" id="L466">      prep.close();</span>
+<span class="nc" id="L467">    } catch (Exception e) {</span>
+<span class="nc" id="L468">      System.out.println(&quot;Exception occured while updating priority table&quot;);</span>
+<span class="nc" id="L469">      e.printStackTrace();</span>
+<span class="nc" id="L470">      return;</span>
+<span class="nc" id="L471">    }</span>
+<span class="nc" id="L472">  }</span>
+
+  public List&lt;Double&gt; getPriorities(int id) throws ClassNotFoundException, SQLException {
+<span class="nc" id="L475">    List&lt;Double&gt; priorities = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L476" title="All 2 branches missed.">    for (int i = 1; i &lt; numTables; i++) {</span>
+<span class="nc" id="L477">      String currentTable = &quot;priorities&quot; + String.valueOf(i);</span>
+<span class="nc" id="L478">      PreparedStatement prep = conn2.prepareStatement(&quot;SELECT priority FROM ? WHERE id = ?&quot;);</span>
+<span class="nc" id="L479">      prep.close();</span>
+    }
+<span class="nc" id="L481">    return priorities;</span>
+  }
+
+  /**
+   * Creates a map with the food group id as an integer key and the the corresponding food
+   * group as the string value.
+   *
+   * @return a map mapping from food group id (integer) to food group (string)
+   * @throws ClassNotFoundException If the class is not found.
+   * @throws SQLException If there is an error executing the SQL query.
+   */
+  public Map&lt;Integer, String&gt; createIdMap() throws ClassNotFoundException, SQLException {
+<span class="fc" id="L493">    Map&lt;Integer, String&gt; foodGroups = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L494">    PreparedStatement prep = conn1.prepareStatement(&quot;SELECT * FROM 'food_group'&quot;);</span>
+<span class="fc" id="L495">    ResultSet rs = prep.executeQuery();</span>
+<span class="fc bfc" id="L496" title="All 2 branches covered.">    while (rs.next()) {</span>
+<span class="fc" id="L497">      foodGroups.put(rs.getInt(1), rs.getString(2));</span>
+    }
+<span class="fc" id="L499">    prep.close();</span>
+<span class="fc" id="L500">    return foodGroups;</span>
+  }
+
+  public Map&lt;String, Integer&gt; createIdMapStringKey() throws ClassNotFoundException, SQLException {
+<span class="fc" id="L504">    Map&lt;String, Integer&gt; foodGroups = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L505">    PreparedStatement prep = conn1.prepareStatement(&quot;SELECT * FROM 'food_group'&quot;);</span>
+<span class="fc" id="L506">    ResultSet rs = prep.executeQuery();</span>
+<span class="fc bfc" id="L507" title="All 2 branches covered.">    while (rs.next()) {</span>
+<span class="fc" id="L508">      foodGroups.put(rs.getString(2), rs.getInt(1));</span>
+    }
+<span class="fc" id="L510">    prep.close();</span>
+<span class="fc" id="L511">    return foodGroups;</span>
+  }
+
+  /**
+   * Retrieve the food group ids of the foods in order.
+   * @return an array of food group ids in order
+   * @throws ClassNotFoundException If the class is not found.
+   * @throws SQLException If there is an error executing the SQL query.
+   */
+  public List&lt;Integer&gt; retrieveFoodGroupIds() throws ClassNotFoundException, SQLException {
+<span class="fc" id="L521">    PreparedStatement prep = conn1.prepareStatement(&quot;SELECT food_group_id FROM 'food'&quot;);</span>
+<span class="fc" id="L522">    ResultSet rs = prep.executeQuery();</span>
+<span class="fc" id="L523">    List&lt;Integer&gt; ids = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L524" title="All 2 branches covered.">    while (rs.next()) {</span>
+<span class="fc" id="L525">      ids.add(rs.getInt(1));</span>
+    }
+<span class="fc" id="L527">    prep.close();</span>
+<span class="fc" id="L528">    return ids;</span>
+  }
+
+  /**
+   * Queries the logs for a given user.
+   * @param id The user's ID
+   * @return list with log information (each row is a food id + date)
+   */
+  public List&lt;List&lt;String&gt;&gt; queryLogs(String id) {
+
+    // sql code to query logs
+    PreparedStatement prep;
+    try {
+<span class="nc" id="L541">      prep = conn2.prepareStatement(&quot;SELECT * &quot;</span>
+              + &quot; FROM logs WHERE &quot;
+              + &quot;(logs.userId == ?);&quot;);
+<span class="nc" id="L544">      prep.setString(1, id);</span>
+<span class="nc" id="L545">    } catch (Exception e) {</span>
+<span class="nc" id="L546">      e.printStackTrace();</span>
+<span class="nc" id="L547">      System.err.println(&quot;ERROR: prepareStatement SQL query failed.&quot;);</span>
+<span class="nc" id="L548">      return null;</span>
+<span class="nc" id="L549">    }</span>
+
+    // gets the food ID and date associated with each log
+    try {
+<span class="nc" id="L553">      ResultSet rs = prep.executeQuery();</span>
+<span class="nc" id="L554">      List&lt;List&lt;String&gt;&gt; logs = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L556" title="All 2 branches missed.">      while (rs.next()) {</span>
+<span class="nc" id="L557">        List&lt;String&gt; oneLog = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L558">        String foodId = rs.getString(&quot;foodID&quot;);</span>
+<span class="nc" id="L559">        String date = rs.getString(&quot;date&quot;);</span>
+<span class="nc" id="L560">        oneLog.add(foodId);</span>
+<span class="nc" id="L561">        oneLog.add(date);</span>
+<span class="nc" id="L562">        logs.add(oneLog);</span>
+<span class="nc" id="L563">      }</span>
+
+<span class="nc" id="L565">      rs.close();</span>
+<span class="nc" id="L566">      prep.close();</span>
+
+<span class="nc" id="L568">      return logs;</span>
+<span class="nc" id="L569">    } catch (Exception e) {</span>
+
+<span class="nc" id="L571">      System.out.println(&quot;ERROR: Could not query Check ins&quot;);</span>
+<span class="nc" id="L572">      return null;</span>
+    }
+  }
+
+  /**
+   * Queries for a food ID in the USDA Food db.
+   *
+   * @param foodName name of food
+   * @return foodID if it's in USDA Food db; null otherwise
+   */
+  public String queryDBFood(String foodName) {
+    // queries into food table, tries to find ID of food with given foodName
+    PreparedStatement prep;
+    try {
+<span class="fc" id="L586">      prep = conn1.prepareStatement(&quot;SELECT food.id &quot;</span>
+              + &quot; FROM food WHERE &quot;
+              + &quot;(food.long_desc == ?);&quot;);
+
+<span class="fc" id="L590">      prep.setString(1, foodName);</span>
+
+<span class="nc" id="L592">    } catch (Exception e) {</span>
+<span class="nc" id="L593">      e.printStackTrace();</span>
+<span class="nc" id="L594">      System.err.println(&quot;ERROR: prepareStatement SQL query failed.&quot;);</span>
+<span class="nc" id="L595">      return null;</span>
+<span class="fc" id="L596">    }</span>
+
+    // check if result set is not empty - food exists
+    ResultSet rs;
+    try {
+<span class="fc" id="L601">      rs = prep.executeQuery();</span>
+<span class="pc bpc" id="L602" title="1 of 2 branches missed.">      if (rs.next()) {</span>
+<span class="fc" id="L603">        return rs.getString(&quot;id&quot;);</span>
+      }
+
+<span class="nc" id="L606">      rs.close();</span>
+<span class="nc" id="L607">      prep.close();</span>
+<span class="nc" id="L608">    } catch (Exception e) {</span>
+<span class="nc" id="L609">      e.printStackTrace();</span>
+<span class="nc" id="L610">      System.err.println(&quot;ERROR: executeQuery failed.&quot;);</span>
+<span class="nc" id="L611">      return null;</span>
+<span class="nc" id="L612">    }</span>
+
+<span class="nc" id="L614">    return null;</span>
+  }
+
+  /**
+   * Queries for a food ID in the CustomFoods table.
+   *
+   * @param foodName name of food
+   * @param userId   user ID
+   * @return foodID if food is in CustomFoods table; null otherwise
+   */
+  public String queryCustomFood(String foodName, String userId) {
+    // queries into CustomFoods, tries to find ID of food with given foodName and userID
+    PreparedStatement prep;
+    try {
+<span class="fc" id="L628">      prep = conn2.prepareStatement(&quot;SELECT CustomFoods.foodID &quot;</span>
+              + &quot; FROM CustomFoods WHERE &quot;
+              + &quot;(CustomFoods.foodName == ?) AND (CustomFoods.userID == ?);&quot;);
+
+<span class="fc" id="L632">      prep.setString(1, foodName);</span>
+<span class="fc" id="L633">      prep.setString(2, userId);</span>
+
+<span class="nc" id="L635">    } catch (Exception e) {</span>
+<span class="nc" id="L636">      e.printStackTrace();</span>
+<span class="nc" id="L637">      System.err.println(&quot;ERROR: prepareStatement SQL query failed.&quot;);</span>
+<span class="nc" id="L638">      return null;</span>
+<span class="fc" id="L639">    }</span>
+
+    // returns food id in result set, if exists
+    ResultSet rs;
+    try {
+<span class="fc" id="L644">      rs = prep.executeQuery();</span>
+<span class="fc bfc" id="L645" title="All 2 branches covered.">      if (rs.next()) {</span>
+<span class="fc" id="L646">        String toReturn = rs.getString(&quot;foodID&quot;);</span>
+<span class="fc" id="L647">        rs.close();</span>
+<span class="fc" id="L648">        prep.close();</span>
+<span class="fc" id="L649">        return toReturn;</span>
+      }
+<span class="nc" id="L651">    } catch (Exception e) {</span>
+<span class="nc" id="L652">      e.printStackTrace();</span>
+<span class="nc" id="L653">      System.err.println(&quot;ERROR: executeQuery failed.&quot;);</span>
+<span class="nc" id="L654">      return null;</span>
+<span class="fc" id="L655">    }</span>
+
+<span class="fc" id="L657">    return null;</span>
+  }
+
+  public String queryFoodNameFromId(String foodId, String userId) {
+    // queries into CustomFoods, tries to find ID of food with given foodName and userID
+    PreparedStatement prep;
+    try {
+<span class="fc" id="L664">      prep = conn2.prepareStatement(&quot;SELECT CustomFoods.foodName &quot;</span>
+              + &quot; FROM CustomFoods WHERE &quot;
+              + &quot;(CustomFoods.foodId == ?) AND (CustomFoods.userID == ?);&quot;);
+
+<span class="fc" id="L668">      prep.setString(1, foodId);</span>
+<span class="fc" id="L669">      prep.setString(2, userId);</span>
+
+<span class="nc" id="L671">    } catch (Exception e) {</span>
+<span class="nc" id="L672">      e.printStackTrace();</span>
+<span class="nc" id="L673">      System.err.println(&quot;ERROR: prepareStatement SQL query failed.&quot;);</span>
+<span class="nc" id="L674">      return null;</span>
+<span class="fc" id="L675">    }</span>
+
+    // returns food id in result set, if exists
+    ResultSet rs;
+    try {
+<span class="fc" id="L680">      rs = prep.executeQuery();</span>
+<span class="pc bpc" id="L681" title="1 of 2 branches missed.">      if (rs.next()) {</span>
+<span class="fc" id="L682">        String toReturn = rs.getString(&quot;foodName&quot;);</span>
+<span class="fc" id="L683">        rs.close();</span>
+<span class="fc" id="L684">        prep.close();</span>
+<span class="fc" id="L685">        return toReturn;</span>
+      }
+<span class="nc" id="L687">    } catch (Exception e) {</span>
+<span class="nc" id="L688">      e.printStackTrace();</span>
+<span class="nc" id="L689">      System.err.println(&quot;ERROR: executeQuery failed.&quot;);</span>
+<span class="nc" id="L690">      return null;</span>
+<span class="nc" id="L691">    }</span>
+
+<span class="nc" id="L693">    return null;</span>
+  }
+
+  /**
+   * Inserts custom food into CustomFood table
+   * a single log into the logs table.
+   *
+   * @param log list of log fields
+   * @return success or failure number
+   * -1 - error: sql error :/
+   * 1 - error: calories is not a double
+   * 2 - error: proteins is not a double
+   * 3 - error: fats is not a double
+   * 4 - error: carbs is not a double
+   * 5 - error: date format incorrect
+   * 0 - inserted successfully!
+   */
+  public int insertCustomLog(List&lt;String&gt; log) {
+
+<span class="nc" id="L712">    String foodId = Integer.toString((int) (Math.random() * (randomBounds1) + randomBounds2));</span>
+<span class="nc" id="L713">    String foodName = log.get(0);</span>
+<span class="nc" id="L714">    String calories = log.get(1);</span>
+<span class="nc" id="L715">    String protein = log.get(2);</span>
+<span class="nc" id="L716">    String fats = log.get(3);</span>
+<span class="nc" id="L717">    String carbs = log.get(4);</span>
+<span class="nc" id="L718">    String userId = log.get(5);</span>
+<span class="nc" id="L719">    String date = log.get(6);</span>
+
+
+    // validating cals is a double
+    try {
+<span class="nc" id="L724">      Double.parseDouble(calories);</span>
+<span class="nc" id="L725">    } catch (Exception e) {</span>
+<span class="nc" id="L726">      System.out.println(&quot;ERROR: calories are not a double&quot;);</span>
+<span class="nc" id="L727">      return 1;</span>
+<span class="nc" id="L728">    }</span>
+
+    // validating protein is a double
+    try {
+<span class="nc" id="L732">      Double.parseDouble(protein);</span>
+<span class="nc" id="L733">    } catch (Exception e) {</span>
+<span class="nc" id="L734">      System.out.println(&quot;ERROR: proteins are not a double&quot;);</span>
+<span class="nc" id="L735">      return 2;</span>
+<span class="nc" id="L736">    }</span>
+
+    // validating fat is a double
+    try {
+<span class="nc" id="L740">      Double.parseDouble(fats);</span>
+<span class="nc" id="L741">    } catch (Exception e) {</span>
+<span class="nc" id="L742">      System.out.println(&quot;ERROR: fats are not a double&quot;);</span>
+<span class="nc" id="L743">      return 3;</span>
+<span class="nc" id="L744">    }</span>
+
+    // validating carbs is a double
+    try {
+<span class="nc" id="L748">      Double.parseDouble(carbs);</span>
+<span class="nc" id="L749">    } catch (Exception e) {</span>
+<span class="nc" id="L750">      System.out.println(&quot;ERROR: carbs are not a double&quot;);</span>
+<span class="nc" id="L751">      return 4;</span>
+<span class="nc" id="L752">    }</span>
+
+    // check date is formatted correctly
+<span class="nc" id="L755">    Pattern pattern = Pattern.compile(&quot;^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)&quot;</span>
+            + &quot;(\\/|-|\\.)(?:0?[13-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2&quot;
+            + &quot;\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579]&quot;
+            + &quot;[26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|&quot;
+            + &quot;[2-9]\\d)?\\d{2})$&quot;, Pattern.CASE_INSENSITIVE);
+<span class="nc" id="L760">    Matcher matcher = pattern.matcher(date);</span>
+<span class="nc" id="L761">    boolean matchFound = matcher.find();</span>
+<span class="nc bnc" id="L762" title="All 2 branches missed.">    if (!matchFound) {</span>
+<span class="nc" id="L763">      System.out.println(&quot;ERROR: Date not in right format&quot;);</span>
+<span class="nc" id="L764">      return 5;</span>
+    }
+
+    PreparedStatement prep;
+    try {
+<span class="nc" id="L769">      prep = conn2.prepareStatement(</span>
+              &quot;INSERT INTO CustomFoods VALUES (?, ?, ?, ?, ?, ?, ?);&quot;);
+
+<span class="nc" id="L772">      prep.setString(1, userId);</span>
+<span class="nc" id="L773">      prep.setString(2, foodId);</span>
+<span class="nc" id="L774">      prep.setString(3, foodName);</span>
+<span class="nc" id="L775">      prep.setString(4, calories);</span>
+<span class="nc" id="L776">      prep.setString(5, protein);</span>
+<span class="nc" id="L777">      prep.setString(6, fats);</span>
+<span class="nc" id="L778">      prep.setString(7, carbs);</span>
+
+<span class="nc" id="L780">      prep.addBatch();</span>
+<span class="nc" id="L781">      prep.executeBatch();</span>
+<span class="nc" id="L782">      prep.close();</span>
+
+<span class="nc" id="L784">    } catch (Exception e) {</span>
+<span class="nc" id="L785">      e.printStackTrace();</span>
+<span class="nc" id="L786">      System.err.println(&quot;ERROR: insert failed&quot;);</span>
+<span class="nc" id="L787">      return -1;</span>
+<span class="nc" id="L788">    }</span>
+
+    // inserts log into logs table
+<span class="nc" id="L791">    List&lt;String&gt; logData = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L792">    logData.add(userId);</span>
+<span class="nc" id="L793">    logData.add(foodName);</span>
+<span class="nc" id="L794">    logData.add(date);</span>
+<span class="nc" id="L795">    this.insertLog(logData);</span>
+
+<span class="nc" id="L797">    return 0;</span>
+  }
+
+  /**
+   * Inserts a single log into the logs table.
+   *
+   * @param log list of 1 log
+   *            index 0: userId
+   *            index 1: foodname
+   *            index 2: date
+   * @return success or failure number
+   * -1 - error: sql error :/
+   * 1 - error: food isn't in the CustomFood nor USDA Food db
+   * 3 - error: date isn't formatted correctly
+   * 0 - inserted successfully!
+   **/
+  public int insertLog(List&lt;String&gt; log) {
+<span class="nc" id="L814">    String userID = log.get(0);</span>
+<span class="nc" id="L815">    String foodName = log.get(1);</span>
+<span class="nc" id="L816">    String date = log.get(2);</span>
+
+    // check if food is in the CustomFood or USDAFood db
+<span class="nc" id="L819">    String foodId = queryCustomFood(foodName, userID);</span>
+<span class="nc bnc" id="L820" title="All 2 branches missed.">    if (foodId == null) {</span>
+<span class="nc" id="L821">      foodId = queryDBFood(foodName);</span>
+<span class="nc bnc" id="L822" title="All 2 branches missed.">      if (foodId == null) {</span>
+<span class="nc" id="L823">        System.out.println(&quot;User must create own food log&quot;);</span>
+<span class="nc" id="L824">        return 1;</span>
+      }
+    }
+
+    // check date is formatted correctly
+<span class="nc" id="L829">    Pattern pattern = Pattern.compile(&quot;^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)&quot;</span>
+            + &quot;(\\/|-|\\.)(?:0?[13-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2&quot;
+            + &quot;\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579]&quot;
+            + &quot;[26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|&quot;
+            + &quot;[2-9]\\d)?\\d{2})$&quot;, Pattern.CASE_INSENSITIVE);
+<span class="nc" id="L834">    Matcher matcher = pattern.matcher(date);</span>
+<span class="nc" id="L835">    boolean matchFound = matcher.find();</span>
+<span class="nc bnc" id="L836" title="All 2 branches missed.">    if (!matchFound) {</span>
+<span class="nc" id="L837">      System.out.println(&quot;ERROR: Date not in right format&quot;);</span>
+<span class="nc" id="L838">      return 2;</span>
+    }
+
+<span class="nc bnc" id="L841" title="All 2 branches missed.">    if (date.length() &lt; numTables) {</span>
+<span class="nc" id="L842">      StringBuilder dateFixer = new StringBuilder(date);</span>
+      //if the first slash is out of place
+<span class="nc bnc" id="L844" title="All 2 branches missed.">      if (date.indexOf(&quot;/&quot;) != 2) {</span>
+        //it means that the month is just m so make mm
+<span class="nc" id="L846">        dateFixer.insert(0, '0');</span>
+        //if the first and second slash is out of place
+        //it means day is just d so make dd
+<span class="nc bnc" id="L849" title="All 2 branches missed.">        if (date.indexOf(&quot;/&quot;, 2) != 4) {</span>
+<span class="nc" id="L850">          dateFixer.insert(3, '0');</span>
+          //if both month and day were wrong and year is wrong
+<span class="nc bnc" id="L852" title="All 2 branches missed.">          if (date.substring(4).length() == 2) {</span>
+<span class="nc" id="L853">            dateFixer.insert(6, '0');</span>
+<span class="nc" id="L854">            dateFixer.insert(6, '2');</span>
+          }
+          //if the month is incorrect, the day is correct, y is incorrect
+<span class="nc bnc" id="L857" title="All 2 branches missed.">        } else if (date.substring(5).length() == 2) {</span>
+<span class="nc" id="L858">          dateFixer.insert(6, '0');</span>
+<span class="nc" id="L859">          dateFixer.insert(6, '2');</span>
+        }
+        //if the month is correct and the day is incorrect
+<span class="nc bnc" id="L862" title="All 2 branches missed.">      } else if (date.indexOf(&quot;/&quot;, 3) != 5) {</span>
+<span class="nc" id="L863">        dateFixer.insert(3, '0');</span>
+        //if the day and the year are wrong
+<span class="nc bnc" id="L865" title="All 2 branches missed.">        if (date.substring(5).length() == 2) {</span>
+<span class="nc" id="L866">          dateFixer.insert(6, '0');</span>
+<span class="nc" id="L867">          dateFixer.insert(6, '2');</span>
+        }
+        //if the day and month are correct, but the year is incorrect
+<span class="nc bnc" id="L870" title="All 2 branches missed.">      } else if (date.substring(5).length() == 2) {</span>
+<span class="nc" id="L871">        dateFixer.insert(6, '0');</span>
+<span class="nc" id="L872">        dateFixer.insert(6, '2');</span>
+      }
+<span class="nc" id="L874">      date = dateFixer.toString();</span>
+    }
+<span class="nc" id="L876">    System.out.println(&quot;Fixed Date: &quot; + date);</span>
+
+    // insert into logs table
+    PreparedStatement prep;
+    try {
+<span class="nc" id="L881">      prep = conn2.prepareStatement(</span>
+              &quot;INSERT INTO logs VALUES (?, ?, ?);&quot;);
+
+      // a row in the logs table goes user ID, food ID, date
+<span class="nc" id="L885">      prep.setString(1, userID);</span>
+<span class="nc" id="L886">      prep.setString(2, foodId);</span>
+<span class="nc" id="L887">      prep.setString(3, date);</span>
+
+<span class="nc" id="L889">      prep.execute();</span>
+<span class="nc" id="L890">      prep.close();</span>
+
+<span class="nc" id="L892">    } catch (Exception e) {</span>
+<span class="nc" id="L893">      e.printStackTrace();</span>
+<span class="nc" id="L894">      System.err.println(&quot;ERROR: insert failed&quot;);</span>
+<span class="nc" id="L895">      return -1;</span>
+<span class="nc" id="L896">    }</span>
+
+<span class="nc" id="L898">    return 0;</span>
+  }
+
+  /**
+   * Inserts a single log into the logs table.
+   *
+   * @param foodName name of Food
+   * @param userId   userID
+   * @return success or failure number
+   * -1 - error: sql error :/
+   * 1 - error: food isn't in the CustomFood nor USDA Food db
+   * 0 - inserted successfully!
+   **/
+  public List&lt;String&gt; queryNutrition(String foodName, String userId) {
+
+<span class="fc" id="L913">    boolean isCustomFood = false;</span>
+
+    // check if food is in the CustomFood or USDAFood db
+<span class="fc" id="L916">    String foodId = queryCustomFood(foodName, userId);</span>
+<span class="pc bpc" id="L917" title="1 of 2 branches missed.">    if (foodId == null) {</span>
+<span class="fc" id="L918">      foodId = queryDBFood(foodName);</span>
+<span class="pc bpc" id="L919" title="1 of 2 branches missed.">      if (foodId == null) {</span>
+<span class="nc" id="L920">        System.out.println(&quot;User must create own food log&quot;);</span>
+<span class="nc" id="L921">        return null;</span>
+      }
+    } else {
+<span class="nc" id="L924">      isCustomFood = true;</span>
+    }
+
+    PreparedStatement prep1;
+<span class="fc" id="L928">    PreparedStatement prep2 = null;</span>
+<span class="fc" id="L929">    PreparedStatement prep3 = null;</span>
+<span class="fc" id="L930">    PreparedStatement prep4 = null;</span>
+<span class="pc bpc" id="L931" title="1 of 2 branches missed.">    if (isCustomFood) {</span>
+      try {
+<span class="nc" id="L933">        prep1 = conn2.prepareStatement(&quot;SELECT * &quot;</span>
+                + &quot; FROM CustomFoods WHERE &quot;
+                + &quot;(CustomFoods.foodID == ?) AND (CustomFoods.userID == ?);&quot;);
+
+<span class="nc" id="L937">        prep1.setString(1, foodId);</span>
+<span class="nc" id="L938">        prep1.setString(2, userId);</span>
+
+//          prep.addBatch();
+//          prep.executeBatch();
+
+<span class="nc" id="L943">      } catch (Exception e) {</span>
+<span class="nc" id="L944">        e.printStackTrace();</span>
+<span class="nc" id="L945">        System.err.println(&quot;ERROR: insert failed&quot;);</span>
+<span class="nc" id="L946">        return null;</span>
+<span class="nc" id="L947">      }</span>
+    } else {
+      try {
+
+<span class="fc" id="L951">        prep1 = conn1.prepareStatement(&quot;SELECT amount &quot;</span>
+                + &quot; FROM nutrition WHERE food_id == ? AND nutrient_id = ?;&quot;);
+
+<span class="fc" id="L954">        prep1.setInt(1, parseInt(foodId));</span>
+<span class="fc" id="L955">        prep1.setInt(2, proteinId);</span>
+
+<span class="fc" id="L957">        prep2 = conn1.prepareStatement(&quot;SELECT amount &quot;</span>
+                + &quot; FROM nutrition WHERE food_id == ? AND nutrient_id = ?;&quot;);
+
+<span class="fc" id="L960">        prep2.setInt(1, parseInt(foodId));</span>
+<span class="fc" id="L961">        prep2.setInt(2, fatId);</span>
+
+<span class="fc" id="L963">        prep3 = conn1.prepareStatement(&quot;SELECT amount &quot;</span>
+                + &quot; FROM nutrition WHERE food_id == ? AND nutrient_id = ?;&quot;);
+
+<span class="fc" id="L966">        prep3.setInt(1, parseInt(foodId));</span>
+<span class="fc" id="L967">        prep3.setInt(2, carbId);</span>
+
+<span class="fc" id="L969">        prep4 = conn1.prepareStatement(&quot;SELECT amount &quot;</span>
+                + &quot; FROM nutrition WHERE food_id == ? AND nutrient_id = ?;&quot;);
+
+<span class="fc" id="L972">        prep4.setInt(1, parseInt(foodId));</span>
+<span class="fc" id="L973">        prep4.setInt(2, calId);</span>
+
+
+<span class="nc" id="L976">      } catch (Exception e) {</span>
+<span class="nc" id="L977">        e.printStackTrace();</span>
+<span class="nc" id="L978">        System.err.println(&quot;ERROR: insert failed&quot;);</span>
+<span class="nc" id="L979">        return null;</span>
+<span class="fc" id="L980">      }</span>
+    }
+
+    ResultSet rs;
+    ResultSet rs1;
+    ResultSet rs2;
+    ResultSet rs3;
+    ResultSet rs4;
+
+<span class="fc" id="L989">    List&lt;String&gt; nutritionFacts = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L990" title="1 of 2 branches missed.">    if (isCustomFood) {</span>
+      try {
+<span class="nc" id="L992">        rs = prep1.executeQuery();</span>
+<span class="nc bnc" id="L993" title="All 2 branches missed.">        if (rs.next()) {</span>
+<span class="nc" id="L994">          String calories = rs.getString(&quot;calories&quot;);</span>
+<span class="nc" id="L995">          String protein = rs.getString(&quot;protein&quot;);</span>
+<span class="nc" id="L996">          String fats = rs.getString(&quot;fats&quot;);</span>
+<span class="nc" id="L997">          String carbs = rs.getString(&quot;carbs&quot;);</span>
+<span class="nc" id="L998">          nutritionFacts.add(protein);</span>
+<span class="nc" id="L999">          nutritionFacts.add(fats);</span>
+<span class="nc" id="L1000">          nutritionFacts.add(carbs);</span>
+<span class="nc" id="L1001">          nutritionFacts.add(calories);</span>
+<span class="nc" id="L1002">          return nutritionFacts;</span>
+        }
+<span class="nc" id="L1004">      } catch (Exception e) {</span>
+<span class="nc" id="L1005">        e.printStackTrace();</span>
+<span class="nc" id="L1006">        System.err.println(&quot;ERROR: executeQuery failed.&quot;);</span>
+<span class="nc" id="L1007">        return null;</span>
+<span class="nc" id="L1008">      }</span>
+    } else {
+      try {
+<span class="fc" id="L1011">        rs1 = prep1.executeQuery();</span>
+<span class="pc bpc" id="L1012" title="1 of 2 branches missed.">        if (rs1.next()) {</span>
+<span class="fc" id="L1013">          String protein = rs1.getString(1);</span>
+<span class="fc" id="L1014">          nutritionFacts.add(protein);</span>
+<span class="fc" id="L1015">          rs1.close();</span>
+<span class="fc" id="L1016">          prep1.close();</span>
+        }
+<span class="fc" id="L1018">        rs2 = prep2.executeQuery();</span>
+<span class="pc bpc" id="L1019" title="1 of 2 branches missed.">        if (rs2.next()) {</span>
+<span class="fc" id="L1020">          String fats = rs2.getString(1);</span>
+<span class="fc" id="L1021">          nutritionFacts.add(fats);</span>
+<span class="fc" id="L1022">          rs2.close();</span>
+<span class="fc" id="L1023">          prep2.close();</span>
+        }
+<span class="fc" id="L1025">        rs3 = prep3.executeQuery();</span>
+<span class="pc bpc" id="L1026" title="1 of 2 branches missed.">        if (rs3.next()) {</span>
+<span class="fc" id="L1027">          String carbs = rs3.getString(1);</span>
+<span class="fc" id="L1028">          nutritionFacts.add(carbs);</span>
+<span class="fc" id="L1029">          rs3.close();</span>
+<span class="fc" id="L1030">          prep3.close();</span>
+        }
+<span class="fc" id="L1032">        rs4 = prep4.executeQuery();</span>
+<span class="pc bpc" id="L1033" title="1 of 2 branches missed.">        if (rs4.next()) {</span>
+<span class="fc" id="L1034">          String calories = rs4.getString(1);</span>
+<span class="fc" id="L1035">          nutritionFacts.add(calories);</span>
+<span class="fc" id="L1036">          rs4.close();</span>
+<span class="fc" id="L1037">          prep4.close();</span>
+        }
+<span class="nc" id="L1039">      } catch (Exception e) {</span>
+<span class="nc" id="L1040">        e.printStackTrace();</span>
+<span class="nc" id="L1041">        System.err.println(&quot;ERROR: executeQuery failed.&quot;);</span>
+<span class="nc" id="L1042">        return null;</span>
+<span class="fc" id="L1043">      }</span>
+    }
+<span class="fc" id="L1045">    return nutritionFacts;</span>
+  }
+
+  /**
+   * Method to retrieve the food groups that are off limits for a user.
+   * @param id The id of the user who we want to find the off-limit groups for.
+   * @return A list of the food groups that re off limits.
+   * @throws SQLException If there is a problem executing the SQL query.
+   */
+  public List&lt;Integer&gt; getForbiddenGroups(int id) throws SQLException {
+<span class="fc" id="L1055">    List&lt;Integer&gt; forbidden = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L1056">    PreparedStatement prep = conn2.prepareStatement(</span>
+            &quot;SELECT forbidden FROM UserPreferences WHERE id = ?&quot;);
+<span class="fc" id="L1058">    prep.setInt(1, id);</span>
+<span class="fc" id="L1059">    ResultSet rs = prep.executeQuery();</span>
+<span class="fc" id="L1060">    String forbiddenString = null;</span>
+<span class="fc bfc" id="L1061" title="All 2 branches covered.">    while (rs.next()) {</span>
+<span class="fc" id="L1062">      forbiddenString = rs.getString(1);</span>
+    }
+<span class="fc bfc" id="L1064" title="All 2 branches covered.">    if (forbiddenString != null) {</span>
+<span class="fc" id="L1065">      String[] splitForbiddenString = forbiddenString.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L1066" title="All 2 branches covered.">      for (int i = 0; i &lt; splitForbiddenString.length; i++) {</span>
+<span class="pc bpc" id="L1067" title="1 of 2 branches missed.">        if (!splitForbiddenString[i].equals(&quot;&quot;)) {</span>
+<span class="fc" id="L1068">          int forbiddenInt = parseInt(splitForbiddenString[i]);</span>
+<span class="fc" id="L1069">          forbidden.add(forbiddenInt);</span>
+        }
+      }
+    }
+
+<span class="fc" id="L1074">    rs.close();</span>
+<span class="fc" id="L1075">    prep.close();</span>
+<span class="fc" id="L1076">    return forbidden;</span>
+  }
+
+  public String queryFoodFromId(String foodId) {
+    //custom foods first
+    PreparedStatement prep;
+    try {
+<span class="fc" id="L1083">      prep = conn2.prepareStatement(&quot;SELECT CustomFoods.foodName FROM CustomFoods WHERE foodId = ?&quot;);</span>
+<span class="fc" id="L1084">      prep.setString(1, foodId);</span>
+
+<span class="fc" id="L1086">      ResultSet rs = prep.executeQuery();</span>
+<span class="pc bpc" id="L1087" title="1 of 2 branches missed.">      if (rs.next()) {</span>
+<span class="nc" id="L1088">        return rs.getString(&quot;foodName&quot;);</span>
+      }
+<span class="nc" id="L1090">    } catch (Exception e) {</span>
+<span class="nc" id="L1091">      e.printStackTrace();</span>
+<span class="fc" id="L1092">    }</span>
+
+    try {
+<span class="fc" id="L1095">      prep = conn1.prepareStatement(&quot;SELECT food.long_desc FROM food WHERE id = ?&quot;);</span>
+<span class="fc" id="L1096">      prep.setString(1, foodId);</span>
+
+<span class="fc" id="L1098">      ResultSet rs = prep.executeQuery();</span>
+<span class="pc bpc" id="L1099" title="1 of 2 branches missed.">      if (rs.next()) {</span>
+<span class="fc" id="L1100">        return rs.getString(&quot;long_desc&quot;);</span>
+      }
+<span class="nc" id="L1102">    } catch (Exception e) {</span>
+<span class="nc" id="L1103">      e.printStackTrace();</span>
+<span class="nc" id="L1104">    }</span>
+<span class="nc" id="L1105">    return null;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

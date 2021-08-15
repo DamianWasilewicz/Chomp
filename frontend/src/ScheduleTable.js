@@ -428,8 +428,11 @@ function ScheduleTable(props) {
                 <h5>
                     Based on your dietary restrictions and previous meal choices, here are some options for your
                     meals this week. For each day, in each food group, pick the meal you'd like to eat out of the
-                    three suggestions. We'll learn from your choices for next's week's meal plans.
+                    three suggestions.
                 </h5>
+                <h5><em>Note: this will not automatically log the meals. As we learn
+                    more about you through your selections, the options next week will reflect your preferences more!
+                </em></h5>
                 <h6>Click "Request New Schedule" to get next week's schedule</h6>
             </div>
             <button className="requestButton" onClick={requestScheduleInfo}>Request New Schedule</button>

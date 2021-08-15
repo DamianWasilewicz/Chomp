@@ -63,7 +63,11 @@ function Login(props) {
                 <div className="chompBlurb">
                     <h1> <strong>CHOMP!</strong> </h1>
                     <h3> <em>plan better, eat healthier</em> </h3>
-                    <h4 id="serif">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h4>
+                    <h4 id="serif">Chomp! is dedicated to helping people get on track and stay on track when it comes to
+                        eating healthy. We display useful, personalized statistics for our users while also advertising
+                        fresh alternatives for daily meal consumption. By providing users with meal options set to their
+                        specifications, Chomp! can meet the needs of just about anyone. Sign up today to get started on
+                        your journey with Chomp!</h4>
                 </div>
 
                 <div>

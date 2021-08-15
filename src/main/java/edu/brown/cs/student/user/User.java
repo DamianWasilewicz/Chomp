@@ -84,7 +84,6 @@ public class User {
     }
     try {
       //checks the validity of the returned priorities from the data class
-      //TODO: Retrieve the priorities once so that we are not constantly requesting from the backend
       if (data.retrievePriorities(userId) == null || data.retrievePriorities(userId).size() == 0) {
         System.out.println("ERROR: List of priorities is empty or not defined");
         return;
@@ -99,28 +98,20 @@ public class User {
       return;
     }
     List<Double> prioritiesList;
-    //TODO: ACTUALLY I COULD HAVE MADE CHOTOO HAVE THE retrieveGroupIds() METHOD TAKE IN A FOOD ID AS A PARAMETER
-    // AND RETURN ONLY THE GROUP ID FOR THAT FOOD.
-    // IF THERE IS A SLOW RUNTIME, THIS COULD BE A POINT OF CONSIDERATION
     try {
       prioritiesList = data.retrievePriorities(userId);
     } catch (ClassNotFoundException e) {
-      //TODO: PRINT OUT SOMETHING THAT MAKES SENSE
       System.out.println("Exception occurred while retrieving priorities");
       e.printStackTrace();
       return;
     } catch (SQLException throwables) {
-      //TODO: PRINT OUT SOMETHING THAT MAKES SENSE
       System.out.println("Exception occurred while retrieving prirotites");
       throwables.printStackTrace();
       return;
     }
-    //TODO: POSSIBLY MAKE THE DATAPROCESSOR CLASS CREATE THE FOODS SO THAT EACH NEW USER
-    // DOESN'T REPEAT THE SAME FOOD CONSTRUCTIONS
     createFoodList(prioritiesList);
     createFoodMap(foodList);
     for (Food f : foodList) {
-      //TODO: ADD FOODS TO THE DIFFERENT PRIORITY QUEUES DEPENDING ON THE FOOD TYOE
       addToDesignatedQueue(f);
     }
   }
@@ -224,18 +215,8 @@ public class User {
     for (int i = 0; i < foodNames.size(); i++) {
       Food food = new Food(foodNames.get(i),
               foodIds.get(i), i, prioritiesList.get(i), timeSinceLastSeenList.get(i));
-//      try {
       //sets the nutritional information of the food.
-      //TODO: Make the setting of a food nutrition happen on a case
-      // by case basis so it doesn't occure every loop
-//        food.setNutrition(data.getNutrition(food.getId()));
-      // sets the food group id of the food
       food.setFoodGroupId(groupIdList.get(i));
-//      } catch (ClassNotFoundException e) {
-//        e.printStackTrace();
-//      } catch (SQLException throwables) {
-//        throwables.printStackTrace();
-//      }
       try {
         foodList.add(food);
       } catch (Exception e) {
@@ -331,6 +312,7 @@ public class User {
             || dinnerPrioritiesQueue == null) {
       return null;
     }
+    System.out.println("HERE1");
 
     initiliazeScheduleList(schedule);
 
@@ -343,6 +325,7 @@ public class User {
         for (int k = 0; k < numMeals; k++) {
           switch (k) {
             case 0:
+              System.out.println("HERe2");
               List<Food> bfList = new ArrayList<>(breakfastPrioritiesQueue);
 //              Food bfFood = breakfastPrioritiesQueue.remove();
               int dupCounterBfast = i + j;
@@ -351,6 +334,7 @@ public class User {
                 dupCounterBfast++;
                 bfFood = bfList.get(dupCounterBfast);
               }
+              System.out.println("Bfast: " + dupCounterBfast);
               schedule.get(j).get(k).add(bfFood.getName());
 //              breakfastPrioritiesQueue.add(bfFood);
               break;
@@ -363,6 +347,7 @@ public class User {
                 dupCounterLunch++;
                 luFood = luList.get(dupCounterLunch);
               }
+              System.out.println("Lunch: " + dupCounterLunch);
               schedule.get(j).get(k).add(luFood.getName());
 //              lunchPrioritiesQueue.add(luFood);
               break;
@@ -375,6 +360,7 @@ public class User {
                 dupCounterDin++;
                 diFood = diList.get(dupCounterDin);
               }
+              System.out.println("Dinner: " + dupCounterDin);
               schedule.get(j).get(k).add(diFood.getName());
 //              dinnerPrioritiesQueue.add(diFood);
               break;
@@ -384,7 +370,7 @@ public class User {
         }
       }
     }
-
+    System.out.println("HERER3");
     return schedule;
   }
 

@@ -16,7 +16,7 @@ function Textbox(props) {
             <div>
                 <input
                     type={'text'}
-                    value={props.clicked}
+                    value={props.value}
                     onChange={update}
                 />
             </div>

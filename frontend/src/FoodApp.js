@@ -62,10 +62,10 @@ function FoodApp() {
                 <div>
                     <Switch>
                         <Route exact path={"/"}>
-                            {loggedIn ? <About /> : <Login setLoggedIn={setLoggedIn}/>}
+                            <About loggedIn={loggedIn}/>
                         </Route>
                         <Route exact path={"/about"}>
-                            <About /> {/*only one accessible without logging in*/}
+                            <About loggedIn={loggedIn}/> {/*only one accessible without logging in*/}
                         </Route>
                         <Route exact path={"/logging"}>
                             {loggedIn ? <Log/> : <Redirect to={'/login'}/>}

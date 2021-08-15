@@ -101,9 +101,6 @@ public final class Main {
     Spark.externalStaticFileLocation("src/main/resources/static");
     Spark.exception(Exception.class, new ExceptionPrinter());
     // Setup Spark Routes
-    Spark.post("/scheduleInfo", new ScheduleHandler());
-    Spark.post("/login", new LoginHandler());
-    Spark.post("/signup", new SignUpHandler());
 
     Spark.options("/*", (request, response) -> {
       String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
@@ -120,6 +117,9 @@ public final class Main {
     Spark.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
     // set spark routes
+    Spark.post("/scheduleInfo", new ScheduleHandler());
+    Spark.post("/login", new LoginHandler());
+    Spark.post("/signup", new SignUpHandler());
     Spark.post("/logInfo", new LogHandler());
     Spark.post("/scheduleInfo", new ScheduleHandler());
     Spark.post("/dashboardInfo", new DashboardHandler());
@@ -188,17 +188,16 @@ public final class Main {
         forbidden.add(forbiddenRaw.getString(i));
       }
 
-
+      int userId = -1;
 
       if (!password.equals(passwordVerify)) {
         message += "Passwords do not match";
-      }
-      int userId = -1;
-
-      if (!userManager.usernameTaken(username)) {
-        userId = userManager.addUser(username, password, forbidden);
       } else {
-        message += "username taken!";
+        if (!userManager.usernameTaken(username)) {
+          userId = userManager.addUser(username, password, forbidden);
+        } else {
+          message += "username taken!";
+        }
       }
 
       if (userId < 0) {
@@ -233,9 +232,7 @@ public final class Main {
       calendar.setTime(dateOfOrder);
       calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
       Date weekAgoDate = calendar.getTime();
-      System.out.println("week ago date: " + weekAgoDate);
       if (logs != null) {
-        //TODO: get stats on logs
         //NOTE: For now I will assume that the log query has
         // only retrieved from the most recent week
         int carbs = 0;
@@ -243,7 +240,6 @@ public final class Main {
         int proteins = 0;
         int calories = 0;
         for (int i = 0; i < logs.size(); i++) {
-          System.out.println("queried log size" + logs.size());
           //translates the string log into the current date
           try {
             allLogs.add(convertLog(logs.get(i)));
@@ -252,19 +248,14 @@ public final class Main {
             int day = Integer.parseInt(logDate.substring(0, 2));
             int month = Integer.parseInt(logDate.substring(3, 5));
             int year = Integer.parseInt(logDate.substring(6));
-            System.out.println("date: " + month + "/" + day + "/" + year);
             Calendar calendarLog =  Calendar.getInstance();
             calendarLog.set(year, month - 1, day);
             Date objectLogDate = calendarLog.getTime();
-            System.out.println("objectlogdate: " + objectLogDate);
 
             // checks that the date of a log is within the last week before
             // adding it to the calculation.
-            System.out.println("compareTo result: " + objectLogDate.compareTo(weekAgoDate));
             if (objectLogDate.compareTo(weekAgoDate) >= 0) {
-              System.out.println("within week");
               //STEP 1: Get the nutritional facts using the query that Chotoo set up
-              //TODO: FIX THIS USING DAMIAN'S FORMAT SO I DON'T QUERY ON EVERY LOOP
               Map<String, Double> nutritionalInfo = process.getNutrition(
                       (int) Double.parseDouble(logs.get(i).get(0)), id);
               //STEP 2: Calculate the accumulation of all
@@ -458,7 +449,10 @@ public final class Main {
           logInfo = "carbs should be a valid number.";
           break;
         case 5:
-          logInfo = "please follow the MM/DD/YYYY format for the date";
+          logInfo = "please follow the DD/MM/YYYY format for the date";
+          break;
+        case 6:
+          logInfo = "please fill out all forms";
           break;
         default:
           logInfo = "successfully created a new custom food and logged!";

@@ -1,2 +1,4 @@
 edu/brown/cs/student/user/UserTest.class
 edu/brown/cs/student/food/FoodTest.class
+edu/brown/cs/student/user/AlgorithmsTest.class
+edu/brown/cs/student/user/DataProcessingTest.class

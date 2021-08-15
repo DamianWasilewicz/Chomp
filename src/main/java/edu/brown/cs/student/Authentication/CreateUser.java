@@ -39,7 +39,6 @@ public class CreateUser {
       // This is a check so we don't create files that don't exist
       if (new File(filepath).exists()) {
         conn = DriverManager.getConnection(urlToDB);
-        System.out.println("Reaching setting up connection");
         data = myData;
       }
     } catch (Exception e) {

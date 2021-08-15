@@ -124,7 +124,12 @@ function SignUp() {
             <div className="consent">
                 <h1 className="consentHeader"> Consent </h1>
                 <h3><em>please read before making an account</em></h3>
-                <h4 id="serif">We would like to be fully transparent with the data and information that you choose to entrust with us. By signing up with <em>Chomp!</em>, you are giving us permission to store and use information about the food that you log (custom or otherwise), the statistics that we gather about the food that you’ve logged, as well as the dietary preferences you fill out in the form. We will also be storing and using the choices you make about the schedule to further suggest food options that better suit your dietary preferences..</h4>
+                <h4 id="serif">We would like to be fully transparent with the data and information that you choose to
+                    entrust with us. By signing up with <em>Chomp!</em>, you are giving us permission to store and use
+                    information about the food that you log (custom or otherwise), the statistics that we gather about
+                    the food that you’ve logged, as well as the dietary preferences you fill out in the form. We will
+                    also be storing and using the choices you make about the schedule to further suggest food options
+                    that better suit your dietary preferences.</h4>
             </div>
         </div>
     );
