@@ -1,7 +1,10 @@
 # README
 
 ## CHOMP!
+ABOUT 
+Chomp! is dedicated to helping people get on track and stay on track when it comes to eating healthy. We display useful, personalized statistics for our users while also advertising fresh alternatives for daily meal consumption. By providing users with meal options set to their specifications, Chomp! can meet the needs of just about anyone. Sign up today to get started on your journey with Chomp!
 
+![Alt text](/images/Home.png?raw=true "Home")
 ### 0. Partner division of labor
 - `Eva`
   - Communicating with backend databases
