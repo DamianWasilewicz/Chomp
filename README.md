@@ -5,7 +5,7 @@ Chomp! is dedicated to helping people get on track and stay on track when it com
 
 ![Alt text](./images/HomePage.png?raw=true "Home")
 
-We reccomend you a variety of choices for each meal of each day of the week! By keeping track of your dietary restrictions and the food you've chosen, as well as how long it's been since you've chosen a certain food, we reccomend your schedule for next week. By using an ELO algorithm that updates foods' rankings when you choose them and not others but also taking into account recency, Chomp! learns the foods you enjoy and makes sure you're not eating the same meal every day!
+We recommend you a variety of choices for each meal of each day of the week! By keeping track of your dietary restrictions and the food you've chosen, as well as how long it's been since you've chosen a certain food, we reccomend your schedule for next week. By using an ELO algorithm that updates foods' rankings when you choose them and not others but also taking into account recency, Chomp! learns the foods you enjoy and makes sure you're not eating the same meal every day!
 
 ![Alt text](./images/MealPlan.png?raw=true "MealPlan")
 
