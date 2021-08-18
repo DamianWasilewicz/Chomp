@@ -19,6 +19,8 @@ Get stats about the nutritious value of the meals you've logged with us!
 
 ![Alt text](./images/Stats.png?raw=true "Stats")
 
+(Note: User information is encrypted using the RSA encryption scheme!)
+
 
 ### 0. Partner division of labor
 - `Eva`
