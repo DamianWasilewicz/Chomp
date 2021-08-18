@@ -8,16 +8,16 @@ Chomp! is dedicated to helping people get on track and stay on track when it com
 
 We reccomend you a variety of choices for each meal of each day of the week! By keeping track of your dietary restrictions and the food you've chosen, as well as how long it's been since you've chosen a certain food, we reccomend your schedule for next week. By using an ELO algorithm that updates foods' rankings when you choose them and not others but also taking into account recency, Chomp! learns the foods you enjoy and makes sure you're not eating the same meal every day!
 
-![Alt text]('./images/MealPlan.png?raw=true "MealPlan")
-![Alt text]('./images/Schedule.png?raw=true "Schedule")
+![Alt text](./images/MealPlan.png?raw=true "MealPlan")
+![Alt text](./images/Schedule.png?raw=true "Schedule")
 
 Get info about foods in our expansive database! If we don't have your meal item stored, you can add info to it, allowing it to be recognized as an item moving forward!
 
-![Alt text]('./images/Info.png?raw=true "Info")
+![Alt text](./images/Info.png?raw=true "Info")
 
 Get stats about the nutritious value of the meals you've logged with us!
 
-![Alt text]('./images/Stats.png?raw=true "Stats)
+![Alt text](./images/Stats.png?raw=true "Stats)
 
 
 ### 0. Partner division of labor
