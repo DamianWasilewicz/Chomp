@@ -17,7 +17,7 @@ Get info about foods in our expansive database! If we don't have your meal item 
 
 Get stats about the nutritious value of the meals you've logged with us!
 
-![Alt text](./images/Stats.png?raw=true "Stats)
+![Alt text](./images/Stats.png?raw=true "Stats")
 
 
 ### 0. Partner division of labor
